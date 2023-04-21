@@ -105,6 +105,7 @@ class TestSubmitSurvey(unittest.TestCase):
             raise
 
     def assert_items_are_created_at_tracking_endpoint(self, items_created):
+        time.sleep(self.await_records_created)
         number_of_events_after = self.run_get_tracking_response()
         new_items_found_via_tracking_endpoint = number_of_events_after - self.number_of_events_before
 
@@ -130,14 +131,12 @@ class TestSubmitSurvey(unittest.TestCase):
             response = self.run_submit_survey(color=color, music_genre=music_genre, rating=rating,
                                               favorite_movie=favorite_movie)
             self.assert_survey_successfully_submitted(response, "Your survey was successfully submitted")
-        time.sleep(6)
 
         self.assert_items_are_created_at_tracking_endpoint(items_created=24)
 
     """Tests that unrequired question (favorite movie) can be skipped"""
     def test_unrequired_question_can_be_skipped(self):
         response = self.run_submit_survey(color=self.color[0], music_genre=self.music_genre[0], rating=self.rating[0])
-        time.sleep(self.await_records_created)
 
         self.assert_survey_successfully_submitted(response, "Your survey was successfully submitted")
         self.assert_items_are_created_at_tracking_endpoint(items_created=4)
@@ -146,7 +145,6 @@ class TestSubmitSurvey(unittest.TestCase):
     def test_multiple_answer_question_accepts_multiple_answers(self):
         response = self.run_submit_survey(color=self.color[0], rating=self.rating[0],
                                           favorite_movie=self.favorite_movie[0], multiple_answers=True)
-        time.sleep(self.await_records_created)
 
         self.assert_survey_successfully_submitted(response, "Your survey was successfully submitted")
         self.assert_items_are_created_at_tracking_endpoint(items_created=4)
@@ -164,7 +162,6 @@ class TestSubmitSurvey(unittest.TestCase):
         ]
 
         self.number_of_events_before = self.run_get_tracking_response()
-        time.sleep(self.await_records_created)
 
         for test_case in test_cases:
             response = self.run_submit_survey(**test_case["params"])
